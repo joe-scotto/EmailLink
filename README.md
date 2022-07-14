@@ -2,11 +2,11 @@
 A package to handle opening email links in the default app.
 
 # Platforms
-Tested on iOS 15.4 but should work on iOS 13 and up.
+Tested on iOS 16.0 but should work on iOS 13 and up.
 
 # Setup
 1. Add the package to your Swift Package Dependencies
-2. Whitelist the URL schemes in your `Info.plist`. **Please keep this in mind when updating the package.**
+2. Whitelist the URL schemes in your `Info.plist`. 
 ```
 <key>LSApplicationQueriesSchemes</key>
 <array>
@@ -17,3 +17,11 @@ Tested on iOS 15.4 but should work on iOS 13 and up.
     <string>airmail</string>
 </array>
 ```
+
+# Schemes
+SwiftMail supports the most common iOS email clients. You can choose whichever ones you want however, it is recommended to add all of them for the best support. **You must included "LSApplicationueriesSchemes"** otherwise a fatal error will be thrown. Other mail clients not listed here will not work with SwiftMail, please create a pull request with new suggestions along with their matching schemes.
+1. **Airmail** - airmail://
+2. **Gmail** - googlegmail://
+3. **Yahoo** - ymail://
+4. **Spark** - readdle-spark://
+5. **Outlook** - ms-outlook:// 

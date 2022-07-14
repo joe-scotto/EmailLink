@@ -8,8 +8,10 @@ public struct SwiftMail<Content: View>: View {
     private let subject: String?
     private let mailBody: String?
     
+//    private let infoDictionary: [String: Any]?
+    
     // require info.plist passed in order to error check for schemes
-    private let info: Bundle
+//    private let info: Bundle
     
 //    @State private var subject: String?
 //    @State private var emailBody: String?
@@ -28,18 +30,21 @@ public struct SwiftMail<Content: View>: View {
 //    }
     
     public init(to: String, subject: String? = nil, body: String? = nil, @ViewBuilder label: () -> Content) {
+        // Ensure Info.plist includes required schemes
+        guard (Bundle.main.infoDictionary?["LSApplicationQueriesSchemes"]) != nil else {
+            fatalError("Your Info.plist is missing \"LSApplicationQueriesSchemes\". Please refer to the SwiftMail documentation for more details.")
+        }
+        
+        // Set properties
         self.to = to
         self.subject = subject
         self.mailBody = body
         self.label = label()
-        
-       
     }
     
     public var body: some View {
         Button(action: {
-            showAlert = true
-            var nsDictionary: NSDictionary?
+//            showAlert = true
         }) {
             label
         }
@@ -57,12 +62,6 @@ public struct SwiftMail<Content: View>: View {
                             ]
                 )
             }
-//        .alert("Send email with", isPresented: $showAlert) {
-//            Button("Gmail", action: {})
-//            Button("Outlook", action: {})
-//            Button("Spark", role: .destructive, action: {})
-//            Button("Apple Mail", role: .cancel, action: {})
-//        }
     }
     
     
