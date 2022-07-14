@@ -1,4 +1,7 @@
 import SwiftUI
+import UIKit
+
+typealias ActionSheetButton = ActionSheet.Button
 
 public struct SwiftMail<Content: View>: View {
     @State private var showAlert = false
@@ -7,6 +10,10 @@ public struct SwiftMail<Content: View>: View {
     private let to: String
     private let subject: String?
     private let mailBody: String?
+    
+    private var gmailUrl: URL {
+        URL(string: "googlegmail://co?to=\(to)&subject=\(subject)&body=\(mailBody)")!
+    }
     
 //    private let infoDictionary: [String: Any]?
     
@@ -20,14 +27,15 @@ public struct SwiftMail<Content: View>: View {
     
 //    @Binding private var swiftMailAlert: Bool
 //
-//    enum URLSchemes: String, CaseIterable {
-//        case GMail = "googlegmail://",
-//             Outlook = "ms-outlook://",
-//             Yahoo = "ymail://",
-//             Spark = "readdle-spark://",
-//             AirMail = "airmail://",
-//             Default = "mailto:"
-//    }
+    
+    enum URLSchemes: String, CaseIterable {
+        case GMail = "googlegmail://",
+             Outlook = "ms-outlook://",
+             Yahoo = "ymail://",
+             Spark = "readdle-spark://",
+             AirMail = "airmail://",
+             Default = "mailto:"
+    }
     
     public init(to: String, subject: String? = nil, body: String? = nil, @ViewBuilder label: () -> Content) {
         // Ensure Info.plist includes required schemes
@@ -44,24 +52,43 @@ public struct SwiftMail<Content: View>: View {
     
     public var body: some View {
         Button(action: {
-//            showAlert = true
+            showAlert = true
         }) {
             label
         }
         .actionSheet(isPresented: $showAlert) {
-                ActionSheet(title: Text("Multiple Email Apps"),
-                            message: Text("Choose an app to open"),
-                            buttons: [
-                                .cancel(),
-                                .destructive(
-                                    Text("Overwrite Current Workout")
-                                ),
-                                .default(
-                                    Text("Append to Current Workout")
-                                )
-                            ]
-                )
+            ActionSheet(
+                title: Text("Multiple apps installed"),
+                message: Text("Which app do you want to use to send your email?"),
+                buttons: actionSheetButtons()
+            )
+        }
+    }
+    
+    func actionSheetButtons() -> [ActionSheetButton] {
+        var buttons = [ActionSheetButton]()
+        
+        for client in getAvailableClients() {
+            buttons.append(ActionSheetButton.default(
+                Text(client.rawValue)
+            , action: {
+                print(client)
+            }))
+        }
+        
+        return buttons
+    }
+    
+    private func getAvailableClients() -> [URLSchemes] {
+        var availableClients = [URLSchemes]()
+        
+        for scheme in URLSchemes.allCases {
+            if let url = URL(string: scheme.rawValue), UIApplication.shared.canOpenURL(url) {
+                availableClients.append(scheme)
             }
+        }
+        
+        return availableClients
     }
     
     
