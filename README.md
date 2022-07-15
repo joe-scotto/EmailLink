@@ -7,7 +7,7 @@ Tested on iOS 16.0 but should work on iOS and iPadOS 13.0 and up.
 # Setup
 1. Add the package to your Swift Package Dependencies
 2. Whitelist the URL schemes in your `Info.plist`. Refer to the **Schemes** section for more information.
-	```
+	```xml
     <key>LSApplicationQueriesSchemes</key>
 	<array>
 	    <string>googlegmail://</string>
@@ -18,14 +18,14 @@ Tested on iOS 16.0 but should work on iOS and iPadOS 13.0 and up.
 	</array>
     ```
 3. Add the component where you want to use it
-    ```
+    ```swift
     EmailLink("contact@example.com") {
         Text("Contact Us")
     }    
     ```
 # Parameters
 You can add some additional parameters in order to pre-populate the email client when opening. 
-```
+```swift
 EmailLink("contact@example.com", subject: "subject", body: "body") {
     Text("Contact Us")
 }
