@@ -13,7 +13,8 @@ public struct EmailLink<Content: View>: View {
              Outlook = "ms-outlook://",
              Yahoo = "ymail://",
              Spark = "readdle-spark://",
-             AirMail = "airmail://"
+             AirMail = "airmail://",
+             Default = "mailto:"
     }
     
     public init(to: String, subject: String = "", body: String = "", @ViewBuilder label: () -> Content) {
@@ -75,6 +76,16 @@ public struct EmailLink<Content: View>: View {
                     URLQueryItem(name: "subject", value: subject),
                     URLQueryItem(name: "plainBody", value: body)
                 ]
+            ),
+            .Default: EmailClient(
+                name: "Default",
+                scheme: URLSchemes.Default.rawValue,
+                host: "compose",
+                queryItems: [
+                    URLQueryItem(name: "to", value: to),
+                    URLQueryItem(name: "subject", value: subject),
+                    URLQueryItem(name: "body", value: body)
+                ]
             )
         ]
         
@@ -85,15 +96,17 @@ public struct EmailLink<Content: View>: View {
 
     public var body: some View {
         Button(action: {
-            if getAvailableClients().count > 1 {
+            if getAvailableClients().count > 2 {
                 showAlert = true
             }
+            
+            // Open in order
         }) {
             label
         }
         .actionSheet(isPresented: $showAlert) {
             ActionSheet(
-                title: Text("Multiple Clients Found"),
+                title: Text("Multiple Apps Found"),
                 message: Text("Which app do you want to use to send this email?"),
                 buttons: actionSheetButtons()
             )
@@ -113,9 +126,6 @@ public struct EmailLink<Content: View>: View {
         }
         
         buttons.append(.cancel())
-        buttons.append(.default(
-            Text("Open Default")
-        ))
         
         return buttons
     }

@@ -28,3 +28,9 @@ EmailLink supports the most common iOS email clients. You can choose whichever o
 3. **Yahoo** - ymail://
 4. **Spark** - readdle-spark://
 5. **Outlook** - ms-outlook:// 
+
+# Apple Mail
+Since the built-in iOS mail app uses the `mailto:` scheme, this will always be shown. The package will determine if this is the only found option and if it is, it will default to using it.
+
+
+If greater than 2 apps - Mail + Other, open actionsheet

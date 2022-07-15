@@ -7,9 +7,6 @@ struct EmailClient {
     let path: String
     let queryItems: [URLQueryItem]
     
-    // Issue with mail/compose and path
-    // https://stackoverflow.com/questions/35960185/nsurlcomponents-builds-scheme-without
-    
     init(name: String, scheme: String, host: String, path: String = "", queryItems: [URLQueryItem]) {
         self.name = name
         self.scheme = scheme
@@ -20,12 +17,10 @@ struct EmailClient {
     
     var url: URL {
         var components = URLComponents()
-        components.scheme = scheme.replacingOccurrences(of: "://", with: "")
+            components.scheme = scheme.replacingOccurrences(of: "://", with: "")
             components.host = host
             components.path = path
             components.queryItems = queryItems
-        
-        print(components.url!)
         
         guard let url = components.url else {
             fatalError("URL cannot be generated for \"\(name)\".")
