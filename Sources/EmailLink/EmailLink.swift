@@ -3,63 +3,70 @@ import UIKit
 
 typealias ActionSheetButton = ActionSheet.Button
 
-public struct SwiftMail<Content: View>: View {
+public struct EmailLink<Content: View>: View {
     @State private var showAlert = false
     
     private let label: Content
     private let to: String
     private let subject: String?
-    private let mailBody: String?
+    private let mail: String?
+    private let links: [URLSchemes: (appName: String, url: URL)]
     
-    private var gmailUrl: URL {
-        URL(string: "googlegmail://co?to=\(to)&subject=\(subject)&body=\(mailBody)")!
+    private var gmailLink: URL? {
+        return "fdsafa"
     }
     
-//    private let infoDictionary: [String: Any]?
-    
-    // require info.plist passed in order to error check for schemes
-//    private let info: Bundle
-    
-//    @State private var subject: String?
-//    @State private var emailBody: String?
-    
-//    public let alert = Alert(title: Text("Swift Mail"))
-    
-//    @Binding private var swiftMailAlert: Bool
-//
-    
     enum URLSchemes: String, CaseIterable {
-        case GMail = "googlegmail://",
+        case Gmail = "googlegmail://",
              Outlook = "ms-outlook://",
              Yahoo = "ymail://",
              Spark = "readdle-spark://",
-             AirMail = "airmail://",
-             Default = "mailto:"
+             AirMail = "airmail://"
     }
     
     public init(to: String, subject: String? = nil, body: String? = nil, @ViewBuilder label: () -> Content) {
         // Ensure Info.plist includes required schemes
         guard (Bundle.main.infoDictionary?["LSApplicationQueriesSchemes"]) != nil else {
-            fatalError("Your Info.plist is missing \"LSApplicationQueriesSchemes\". Please refer to the SwiftMail documentation for more details.")
+            fatalError("Your Info.plist is missing \"LSApplicationQueriesSchemes\". Please refer to the EmailLink documentation for more details.")
         }
+        
         
         // Set properties
         self.to = to
-        self.subject = subject
-        self.mailBody = body
+        self.subject = subject?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+        self.mail = body?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
         self.label = label()
+        
+        
+        
+        
+        self.links = [
+            .Gmail: (appName: "GMail", url: URL(string: "googlegmail://co?to=\(self.to)&subject=\(self.subject)&body=\(self.mail)")!)
+        ]
+    }
+    
+    private func generateLinks() -> [URLSchemes: URL] {
+        let links = [URLSchemes: URL]()
+        
+        for scheme in URLSchemes.allCases {
+            
+        }
+        
+        return links
     }
     
     public var body: some View {
         Button(action: {
-            showAlert = true
+            if getAvailableClients().count > 1 {
+                showAlert = true
+            }
         }) {
             label
         }
         .actionSheet(isPresented: $showAlert) {
             ActionSheet(
-                title: Text("Multiple apps installed"),
-                message: Text("Which app do you want to use to send your email?"),
+                title: Text("Multiple Clients Found"),
+                message: Text("Which app do you want to use to send this email?"),
                 buttons: actionSheetButtons()
             )
         }
@@ -69,17 +76,24 @@ public struct SwiftMail<Content: View>: View {
         var buttons = [ActionSheetButton]()
         
         for client in getAvailableClients() {
-            buttons.append(ActionSheetButton.default(
+            buttons.append(.default(
                 Text(client.rawValue)
             , action: {
                 print(client)
             }))
         }
         
+        buttons.append(.cancel())
+        buttons.append(.default(
+            Text("Use Default")
+        ))
+        
         return buttons
     }
     
     private func getAvailableClients() -> [URLSchemes] {
+        // Needs to check for Mail app individually as mailto: is always available
+        
         var availableClients = [URLSchemes]()
         
         for scheme in URLSchemes.allCases {
@@ -88,7 +102,12 @@ public struct SwiftMail<Content: View>: View {
             }
         }
         
+        
         return availableClients
+    }
+    
+    private func generateLinks() -> [(app: String, url: URL)] {
+        return [(app: "Spark", url: URL(string: "daf")!)]
     }
     
     
@@ -115,33 +134,4 @@ public struct SwiftMail<Content: View>: View {
 //
 //        return defaultUrl
 //    }
-////
-//    private func composeUrl() {
-//
-//    }
-//
-//    public func openUrl() {
-//        UIApplication.shared.open(URL(string: "https://youtube.com")!)
-//    }
-//
-//    public func getAvailableClients() -> [String] {
-//        var availableClients = [String]()
-//
-//        for scheme in URLSchemes.allCases {
-//            if let url = URL(string: scheme.rawValue), UIApplication.shared.canOpenURL(url) {
-//                availableClients.append(url.absoluteString)
-//            }
-//        }
-//
-//        swiftMailAlert = true
-//
-//        return availableClients
-//    }
-//
-//    public func test() {
-//
-//    }
 }
-
-
-// If multiple found, ask which to open in

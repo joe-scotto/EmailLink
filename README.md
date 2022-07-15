@@ -1,4 +1,4 @@
-# SwiftMail
+# EmailLink
 A package to handle opening email links in the default app.
 
 # Platforms
@@ -19,7 +19,7 @@ Tested on iOS 16.0 but should work on iOS 13 and up.
 ```
 
 # Schemes
-SwiftMail supports the most common iOS email clients. You can choose whichever ones you want however, it is recommended to add all of them for the best support. **You must included "LSApplicationueriesSchemes"** otherwise a fatal error will be thrown. Other mail clients not listed here will not work with SwiftMail, please create a pull request with new suggestions along with their matching schemes.
+EmailLink supports the most common iOS email clients. You can choose whichever ones you want however, it is recommended to add all of them for the best support. **You must included "LSApplicationueriesSchemes"** otherwise a fatal error will be thrown. Other mail clients not listed here will not work with SwiftMail, please create a pull request with new suggestions along with their matching schemes.
     
     The default `mailto:` scheme is not required to work as this is the built-in iOS mail client link.
 

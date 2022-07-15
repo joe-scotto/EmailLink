@@ -3,18 +3,18 @@
 import PackageDescription
 
 let package = Package(
-    name: "SwiftMail",
+    name: "EmailLink",
     platforms: [
         .iOS(.v13)
     ],
     products: [
         .library(
-            name: "SwiftMail",
-            targets: ["SwiftMail"]),
+            name: "EmailLink",
+            targets: ["EmailLink"]),
     ],
     targets: [
         .target(
-            name: "SwiftMail",
+            name: "EmailLink",
             dependencies: [])
     ]
 )
