@@ -16,7 +16,7 @@ public struct EmailLink<Content: View>: View {
              AirMail = "airmail://"
     }
     
-    public init(to: String, subject: String? = nil, body: String? = nil, @ViewBuilder label: () -> Content) {
+    public init(to: String, subject: String = "", body: String = "", @ViewBuilder label: () -> Content) {
         // Ensure Info.plist includes required schemes
         guard (Bundle.main.infoDictionary?["LSApplicationQueriesSchemes"]) != nil else {
             fatalError("Your Info.plist is missing \"LSApplicationQueriesSchemes\". Please refer to the EmailLink documentation for more details.")
@@ -24,29 +24,64 @@ public struct EmailLink<Content: View>: View {
         
         // Set properties
         self.label = label()
-        self.clients = createClients(to: to, subject: subject, body: body)
+        self.clients =  [
+            .Gmail: EmailClient(
+                name: "Gmail",
+                scheme: URLSchemes.Gmail.rawValue,
+                host: "co",
+                queryItems: [
+                    URLQueryItem(name: "to", value: to),
+                    URLQueryItem(name: "subject", value: subject),
+                    URLQueryItem(name: "body", value: body)
+                ]
+            ),
+            .Outlook: EmailClient(
+                name: "Outlook",
+                scheme: URLSchemes.Outlook.rawValue,
+                host: "compose",
+                queryItems: [
+                    URLQueryItem(name: "to", value: to),
+                    URLQueryItem(name: "subject", value: subject),
+                    URLQueryItem(name: "body", value: body)
+                ]
+            ),
+            .Yahoo: EmailClient(
+                name: "Yahoo",
+                scheme: URLSchemes.Yahoo.rawValue,
+                host: "mail",
+                path: "/compose",
+                queryItems: [
+                    URLQueryItem(name: "to", value: to),
+                    URLQueryItem(name: "subject", value: subject),
+                    URLQueryItem(name: "body", value: body)
+                ]
+            ),
+            .Spark: EmailClient(
+                name: "Spark",
+                scheme: URLSchemes.Spark.rawValue,
+                host: "compose",
+                queryItems: [
+                    URLQueryItem(name: "recipient", value: to),
+                    URLQueryItem(name: "subject", value: subject),
+                    URLQueryItem(name: "body", value: body)
+                ]
+            ),
+            .AirMail: EmailClient(
+                name: "Airmail",
+                scheme: URLSchemes.AirMail.rawValue,
+                host: "compose",
+                queryItems: [
+                    URLQueryItem(name: "to", value: to),
+                    URLQueryItem(name: "subject", value: subject),
+                    URLQueryItem(name: "plainBody", value: body)
+                ]
+            )
+        ]
         
         // Try to open first found app
         // If that app cannot open, use mailto:
         // If multiple are found show prompt
     }
-    
-    private func createClients(to: String, subject: String?, body: String?) -> [URLSchemes: EmailClient] {
-        [
-            .Gmail: EmailClient(
-                name: "Gmail",
-                scheme: URLSchemes.Gmail.rawValue,
-                host: "",
-                path: "co",
-                to: URLQueryItem(name: "to", value: to),
-                subject: URLQueryItem(name: "subject", value: subject ?? ""),
-                body: URLQueryItem(name: "body", value: body ?? "")
-            ),
-    //        .Outlook: EmailClient(name: "Outlook", scheme: URLSchemes.Outlook.rawValue, path: "compose", to: "to", subject: "subject", body: "body"),
-    //        .Yahoo: EmailClient(name: "Yahoo", scheme: URLSchemes.Yahoo.rawValue, path: "mail/compose", to: "to", subject: "subject", body: "body"),
-    //        .Spark: EmailClient(name: "Spark", scheme: URLSchemes.Spark.rawValue, path: "compose", to: "recipient", subject: "subject", body: "body"),
-    //        .AirMail: EmailClient(name: "Airmail", scheme: URLSchemes.AirMail.rawValue, path: "compose", to: "to", subject: "subject", body: "plainBody")
-        ]    }
 
     public var body: some View {
         Button(action: {
