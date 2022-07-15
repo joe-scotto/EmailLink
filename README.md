@@ -6,7 +6,7 @@ Tested on iOS 16.0 but should work on iOS and iPadOS 13.0 and up.
 
 # Setup
 1. Add the package to your Swift Package Dependencies
-2. Whitelist the URL schemes in your `Info.plist`. Refer to the **Schemes** section for more information.
+2. Whitelist the URL schemes in your `Info.plist`. Refer to the [**Schemes**](#schemes) section for more information.
 	```xml
     <key>LSApplicationQueriesSchemes</key>
 	<array>
