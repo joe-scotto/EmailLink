@@ -8,15 +8,6 @@ public struct EmailLink<Content: View>: View {
     private let label: Content
     private let clients: [URLSchemes: EmailClient]
     
-    enum URLSchemes: String, CaseIterable {
-        case Gmail = "googlegmail://",
-             Outlook = "ms-outlook://",
-             Yahoo = "ymail://",
-             Spark = "readdle-spark://",
-             AirMail = "airmail://",
-             Default = "mailto:"
-    }
-    
     public init(to: String, subject: String = "", body: String = "", @ViewBuilder label: () -> Content) {
         // Ensure Info.plist includes required schemes
         guard (Bundle.main.infoDictionary?["LSApplicationQueriesSchemes"]) != nil else {
@@ -28,7 +19,7 @@ public struct EmailLink<Content: View>: View {
         self.clients =  [
             .Gmail: EmailClient(
                 name: "Gmail",
-                scheme: URLSchemes.Gmail.rawValue,
+                scheme: .Gmail,
                 host: "co",
                 queryItems: [
                     URLQueryItem(name: "to", value: to),
@@ -38,7 +29,7 @@ public struct EmailLink<Content: View>: View {
             ),
             .Outlook: EmailClient(
                 name: "Outlook",
-                scheme: URLSchemes.Outlook.rawValue,
+                scheme: .Outlook,
                 host: "compose",
                 queryItems: [
                     URLQueryItem(name: "to", value: to),
@@ -48,7 +39,7 @@ public struct EmailLink<Content: View>: View {
             ),
             .Yahoo: EmailClient(
                 name: "Yahoo",
-                scheme: URLSchemes.Yahoo.rawValue,
+                scheme: .Yahoo,
                 host: "mail",
                 path: "/compose",
                 queryItems: [
@@ -59,7 +50,7 @@ public struct EmailLink<Content: View>: View {
             ),
             .Spark: EmailClient(
                 name: "Spark",
-                scheme: URLSchemes.Spark.rawValue,
+                scheme: .Spark,
                 host: "compose",
                 queryItems: [
                     URLQueryItem(name: "recipient", value: to),
@@ -69,7 +60,7 @@ public struct EmailLink<Content: View>: View {
             ),
             .AirMail: EmailClient(
                 name: "Airmail",
-                scheme: URLSchemes.AirMail.rawValue,
+                scheme: .AirMail,
                 host: "compose",
                 queryItems: [
                     URLQueryItem(name: "to", value: to),
@@ -79,8 +70,7 @@ public struct EmailLink<Content: View>: View {
             ),
             .Default: EmailClient(
                 name: "Default",
-                scheme: URLSchemes.Default.rawValue,
-                host: "compose",
+                scheme: .Default,
                 queryItems: [
                     URLQueryItem(name: "to", value: to),
                     URLQueryItem(name: "subject", value: subject),
@@ -88,19 +78,20 @@ public struct EmailLink<Content: View>: View {
                 ]
             )
         ]
-        
-        // Try to open first found app
-        // If that app cannot open, use mailto:
-        // If multiple are found show prompt
     }
 
     public var body: some View {
         Button(action: {
             if getAvailableClients().count > 2 {
                 showAlert = true
+            } else {
+                // Only open first found
+                for client in clients {
+                    if UIApplication.shared.canOpenURL(client.value.url) {
+                        UIApplication.shared.open(client.value.url)
+                    }
+                }
             }
-            
-            // Open in order
         }) {
             label
         }
