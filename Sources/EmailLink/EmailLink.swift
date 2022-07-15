@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 typealias ActionSheetButton = ActionSheet.Button
 
@@ -7,14 +6,7 @@ public struct EmailLink<Content: View>: View {
     @State private var showAlert = false
     
     private let label: Content
-    private let to: String
-    private let subject: String?
-    private let mail: String?
-    private let links: [URLSchemes: (appName: String, url: URL)]
-    
-    private var gmailLink: URL? {
-        return "fdsafa"
-    }
+    private let clients: [URLSchemes: EmailClient]
     
     enum URLSchemes: String, CaseIterable {
         case Gmail = "googlegmail://",
@@ -30,31 +22,32 @@ public struct EmailLink<Content: View>: View {
             fatalError("Your Info.plist is missing \"LSApplicationQueriesSchemes\". Please refer to the EmailLink documentation for more details.")
         }
         
-        
         // Set properties
-        self.to = to
-        self.subject = subject?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
-        self.mail = body?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
         self.label = label()
+        self.clients = createClients(to: to, subject: subject, body: body)
         
-        
-        
-        
-        self.links = [
-            .Gmail: (appName: "GMail", url: URL(string: "googlegmail://co?to=\(self.to)&subject=\(self.subject)&body=\(self.mail)")!)
-        ]
+        // Try to open first found app
+        // If that app cannot open, use mailto:
+        // If multiple are found show prompt
     }
     
-    private func generateLinks() -> [URLSchemes: URL] {
-        let links = [URLSchemes: URL]()
-        
-        for scheme in URLSchemes.allCases {
-            
-        }
-        
-        return links
-    }
-    
+    private func createClients(to: String, subject: String?, body: String?) -> [URLSchemes: EmailClient] {
+        [
+            .Gmail: EmailClient(
+                name: "Gmail",
+                scheme: URLSchemes.Gmail.rawValue,
+                host: "",
+                path: "co",
+                to: URLQueryItem(name: "to", value: to),
+                subject: URLQueryItem(name: "subject", value: subject ?? ""),
+                body: URLQueryItem(name: "body", value: body ?? "")
+            ),
+    //        .Outlook: EmailClient(name: "Outlook", scheme: URLSchemes.Outlook.rawValue, path: "compose", to: "to", subject: "subject", body: "body"),
+    //        .Yahoo: EmailClient(name: "Yahoo", scheme: URLSchemes.Yahoo.rawValue, path: "mail/compose", to: "to", subject: "subject", body: "body"),
+    //        .Spark: EmailClient(name: "Spark", scheme: URLSchemes.Spark.rawValue, path: "compose", to: "recipient", subject: "subject", body: "body"),
+    //        .AirMail: EmailClient(name: "Airmail", scheme: URLSchemes.AirMail.rawValue, path: "compose", to: "to", subject: "subject", body: "plainBody")
+        ]    }
+
     public var body: some View {
         Button(action: {
             if getAvailableClients().count > 1 {
@@ -77,15 +70,16 @@ public struct EmailLink<Content: View>: View {
         
         for client in getAvailableClients() {
             buttons.append(.default(
-                Text(client.rawValue)
+                Text(clients[client]?.name ?? "")
             , action: {
-                print(client)
+                print(clients[client]?.url ?? "")
+                UIApplication.shared.open(clients[client]?.url ?? URL(string: "")!)
             }))
         }
         
         buttons.append(.cancel())
         buttons.append(.default(
-            Text("Use Default")
+            Text("Open Default")
         ))
         
         return buttons
@@ -105,33 +99,4 @@ public struct EmailLink<Content: View>: View {
         
         return availableClients
     }
-    
-    private func generateLinks() -> [(app: String, url: URL)] {
-        return [(app: "Spark", url: URL(string: "daf")!)]
-    }
-    
-    
-//    public var url: URL? {
-//        // Encode URLS
-//        let subjectEncoded = subject.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-//        let bodyEncoded = body.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
-//
-//        let gmailUrl = URL(string: "googlegmail://co?to=\(to)&subject=\(subjectEncoded)&body=\(bodyEncoded)")
-//        let outlookUrl = URL(string: "ms-outlook://compose?to=\(to)&subject=\(subjectEncoded)")
-//        let yahooMail = URL(string: "ymail://mail/compose?to=\(to)&subject=\(subjectEncoded)&body=\(bodyEncoded)")
-//        let sparkUrl = URL(string: "readdle-spark://compose?recipient=\(to)&subject=\(subjectEncoded)&body=\(bodyEncoded)")
-//        let defaultUrl = URL(string: "mailto:\(to)?subject=\(subjectEncoded)&body=\(bodyEncoded)")
-//
-//        if let gmailUrl = gmailUrl, UIApplication.shared.canOpenURL(gmailUrl) {
-//            return gmailUrl
-//        } else if let outlookUrl = outlookUrl, UIApplication.shared.canOpenURL(outlookUrl) {
-//            return outlookUrl
-//        } else if let yahooMail = yahooMail, UIApplication.shared.canOpenURL(yahooMail) {
-//            return yahooMail
-//        } else if let sparkUrl = sparkUrl, UIApplication.shared.canOpenURL(sparkUrl) {
-//            return sparkUrl
-//        }
-//
-//        return defaultUrl
-//    }
 }
