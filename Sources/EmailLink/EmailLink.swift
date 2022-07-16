@@ -8,11 +8,9 @@ public struct EmailLink<Content: View>: View {
     private let label: Content
     private let clients: [URLSchemes: EmailClient]
     
-    public init(to: String, subject: String = "", body: String = "", @ViewBuilder label: () -> Content) {
-        // Ensure Info.plist includes required schemes
-        guard (Bundle.main.infoDictionary?["LSApplicationQueriesSchemes"]) != nil else {
-            fatalError("Your Info.plist is missing \"LSApplicationQueriesSchemes\". Please refer to the EmailLink documentation for more details.")
-        }
+    public init(to: String, subject: String = "", body: String = "", color: UIColor = .systemBlue, @ViewBuilder label: () -> Content) {
+        // Ensure Info.plist includes required keys
+        Self.checkInfoDictionary()
         
         // Set properties
         self.label = label()
@@ -71,13 +69,16 @@ public struct EmailLink<Content: View>: View {
             .Default: EmailClient(
                 name: "Default",
                 scheme: .Default,
+                path: to,
                 queryItems: [
-                    URLQueryItem(name: "to", value: to),
                     URLQueryItem(name: "subject", value: subject),
                     URLQueryItem(name: "body", value: body)
                 ]
             )
         ]
+        
+        // Force color for ActionSheet
+        UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = color
     }
 
     public var body: some View {
@@ -104,15 +105,16 @@ public struct EmailLink<Content: View>: View {
         }
     }
     
-    func actionSheetButtons() -> [ActionSheetButton] {
+    private func actionSheetButtons() -> [ActionSheetButton] {
         var buttons = [ActionSheetButton]()
         
         for client in getAvailableClients() {
             buttons.append(.default(
                 Text(clients[client]?.name ?? "")
             , action: {
-                print(clients[client]?.url ?? "")
-                UIApplication.shared.open(clients[client]?.url ?? URL(string: "")!)
+                if let url = clients[client]?.url {
+                    UIApplication.shared.open(url)
+                }
             }))
         }
         
@@ -122,8 +124,6 @@ public struct EmailLink<Content: View>: View {
     }
     
     private func getAvailableClients() -> [URLSchemes] {
-        // Needs to check for Mail app individually as mailto: is always available
-        
         var availableClients = [URLSchemes]()
         
         for scheme in URLSchemes.allCases {
@@ -132,7 +132,23 @@ public struct EmailLink<Content: View>: View {
             }
         }
         
-        
         return availableClients
+    }
+    
+    private static func checkInfoDictionary() {
+        if let schemes = Bundle.main.infoDictionary?["LSApplicationQueriesSchemes"] as? Array<String> {
+            // Bundle exists, check values
+            for scheme in schemes {
+                if URLSchemes(rawValue: scheme + "://") != nil {
+                    print("Scheem Found")
+                } else {
+                    fatalError("Please ensure all values are added for \"LSApplicationQueriesSchemes\" in your Info.plist.")
+                }
+            }
+        
+        } else {
+            // Check individual schemes
+            fatalError("Your Info.plist is missing \"LSApplicationQueriesSchemes\".")
+        }
     }
 }

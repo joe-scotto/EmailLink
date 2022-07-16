@@ -24,15 +24,15 @@ Tested on iOS 16.0 but should work on iOS and iPadOS 13.0 and up.
     }    
     ```
 # Parameters
-You can add some additional parameters in order to pre-populate the email client when opening. 
-```swift
-EmailLink("contact@example.com", subject: "subject", body: "body") {
-    Text("Contact Us")
-}
-```
+Below are the parameters available on `EmailLink`. 
 
-# Label
-The label parameter accepts anything that conforms to `View`. You can pass practically any SwiftUI component in order to make your link look however you want.
+| Parameter      | Type                  | Required  | Note
+|----------------|-----------------------|-----------|---------------------------------|
+| to             | String                | Yes       | Where to send the email         |
+| subject        | String                | No        | Subject to populate             |
+| body           | String                | No        | Email body to populate          |
+| color          | UIColor               | No        | Color for `ActionSheet` buttons |
+| label          | View                  | Yes       | View to show as the `EmailLink` | 
 
 # Schemes
 In order for EmailLink to work, you must include **LSApplicationQueriesSchemes** along with the associated values in your `Info.plist`. The most common iOS email clients are supported. If an email client is not listed here, it will default to the built-in iOS `mailto:` scheme which will use the system default app.
