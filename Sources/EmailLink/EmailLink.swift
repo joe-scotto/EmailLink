@@ -138,12 +138,11 @@ public struct EmailLink<Content: View>: View {
     private static func checkInfoDictionary() {
         if let schemes = Bundle.main.infoDictionary?["LSApplicationQueriesSchemes"] as? Array<String> {
             // Bundle exists, check values
-            for scheme in schemes {
-                if URLSchemes(rawValue: scheme + "://") == nil {
-                    fatalError("Please ensure all values are added for \"LSApplicationQueriesSchemes\" in your Info.plist.")
+            for requiredScheme in URLSchemes.requiredSchemes() {
+                if !schemes.contains(requiredScheme) {
+                    fatalError("Your Info.plist is missing \"\(requiredScheme)\" for \"LSApplicationQueriesSchemes\".")
                 }
             }
-        
         } else {
             // Check individual schemes
             fatalError("Your Info.plist is missing \"LSApplicationQueriesSchemes\".")

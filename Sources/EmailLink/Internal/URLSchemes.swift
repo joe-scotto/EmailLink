@@ -11,4 +11,14 @@ enum URLSchemes: String, CaseIterable {
             .replacingOccurrences(of: ":", with: "")
             .replacingOccurrences(of: "//", with: "")
     }
+    
+    static func requiredSchemes() -> [String] {
+        [
+            Self.Gmail.formattedScheme(),
+            Self.Outlook.formattedScheme(),
+            Self.Yahoo.formattedScheme(),
+            Self.Spark.formattedScheme(),
+            Self.AirMail.formattedScheme()
+        ]
+    }
 }
