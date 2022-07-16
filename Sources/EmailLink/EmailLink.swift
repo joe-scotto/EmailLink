@@ -139,9 +139,7 @@ public struct EmailLink<Content: View>: View {
         if let schemes = Bundle.main.infoDictionary?["LSApplicationQueriesSchemes"] as? Array<String> {
             // Bundle exists, check values
             for scheme in schemes {
-                if URLSchemes(rawValue: scheme + "://") != nil {
-                    print("Scheem Found")
-                } else {
+                if URLSchemes(rawValue: scheme + "://") == nil {
                     fatalError("Please ensure all values are added for \"LSApplicationQueriesSchemes\" in your Info.plist.")
                 }
             }
