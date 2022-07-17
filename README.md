@@ -38,7 +38,7 @@ Below are the parameters available on `EmailLink`.
 In order for EmailLink to work, you must include **LSApplicationQueriesSchemes** along with the associated values in your `Info.plist`. The most common iOS email clients are supported. If an email client is not listed here, it will default to the built-in iOS `mailto:` scheme which will use the system default app. 
 
 # Issues
-The main reason for this package is to deal with the buggy iOS implementation of the default mail app where sometimes it will not actually try to open. Therefore, it is possible that the `mailto:` scheme may or may not work depending on if that iOS version is working with the default app setting. This shouldn't be an issue as the app handles most clients however, I wanted to mention it in case this issue arrises. 
+The main reason for this package is to deal with the buggy iOS implementation of the default mail app where sometimes it will not actually try to open. Therefore, it is possible that the `mailto:` scheme may or may not work depending on if that iOS version is working with the default app setting. This shouldn't be an issue as EmailLink handles most clients however, I wanted to mention it in case this issue arrises. 
 
 # License
 MIT License
