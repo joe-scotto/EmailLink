@@ -4,93 +4,29 @@ typealias ActionSheetButton = ActionSheet.Button
 
 public struct EmailLink<Content: View>: View {
     @State private var showAlert = false
-    
+    @State private var availableClients = [EmailClient]()
+
     private let label: Content
-    private let clients: [URLSchemes: EmailClient]
-    
+    private let clients: [EmailClient]
+
     public init(to: String, subject: String = "", body: String = "", color: UIColor = .systemBlue, @ViewBuilder label: () -> Content) {
-        // Ensure Info.plist includes required keys
-        Self.checkInfoDictionary()
-        
         // Set properties
         self.label = label()
-        self.clients =  [
-            .Gmail: EmailClient(
-                name: "Gmail",
-                scheme: .Gmail,
-                host: "co",
-                queryItems: [
-                    URLQueryItem(name: "to", value: to),
-                    URLQueryItem(name: "subject", value: subject),
-                    URLQueryItem(name: "body", value: body)
-                ]
-            ),
-            .Outlook: EmailClient(
-                name: "Outlook",
-                scheme: .Outlook,
-                host: "compose",
-                queryItems: [
-                    URLQueryItem(name: "to", value: to),
-                    URLQueryItem(name: "subject", value: subject),
-                    URLQueryItem(name: "body", value: body)
-                ]
-            ),
-            .Yahoo: EmailClient(
-                name: "Yahoo",
-                scheme: .Yahoo,
-                host: "mail",
-                path: "/compose",
-                queryItems: [
-                    URLQueryItem(name: "to", value: to),
-                    URLQueryItem(name: "subject", value: subject),
-                    URLQueryItem(name: "body", value: body)
-                ]
-            ),
-            .Spark: EmailClient(
-                name: "Spark",
-                scheme: .Spark,
-                host: "compose",
-                queryItems: [
-                    URLQueryItem(name: "recipient", value: to),
-                    URLQueryItem(name: "subject", value: subject),
-                    URLQueryItem(name: "body", value: body)
-                ]
-            ),
-            .AirMail: EmailClient(
-                name: "Airmail",
-                scheme: .AirMail,
-                host: "compose",
-                queryItems: [
-                    URLQueryItem(name: "to", value: to),
-                    URLQueryItem(name: "subject", value: subject),
-                    URLQueryItem(name: "plainBody", value: body)
-                ]
-            ),
-            .Default: EmailClient(
-                name: "Default",
-                scheme: .Default,
-                path: to,
-                queryItems: [
-                    URLQueryItem(name: "subject", value: subject),
-                    URLQueryItem(name: "body", value: body)
-                ]
-            )
-        ]
-        
+        self.clients =  EmailClient.allClients(to: to, subject: subject, body: body)
+
         // Force color for ActionSheet
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = color
     }
 
     public var body: some View {
         Button(action: {
-            if getAvailableClients().count > 2 {
+            availableClients = getAvailableClients()
+
+            if availableClients.count > 2 {
                 showAlert = true
             } else {
-                // Only open first found
-                for client in clients {
-                    if UIApplication.shared.canOpenURL(client.value.url) {
-                        UIApplication.shared.open(client.value.url)
-                    }
+                if let url = availableClients.first?.url {
+                    UIApplication.shared.open(url)
                 }
             }
         }) {
@@ -102,40 +38,37 @@ public struct EmailLink<Content: View>: View {
                 message: Text("Which app do you want to use to send this email?"),
                 buttons: actionSheetButtons()
             )
+        }.onAppear() {
+            // Ensure Info.plist includes required keys before loading view.
+            self.checkInfoDictionary()
         }
     }
-    
+
     private func actionSheetButtons() -> [ActionSheetButton] {
         var buttons = [ActionSheetButton]()
-        
-        for client in getAvailableClients() {
-            buttons.append(.default(
-                Text(clients[client]?.name ?? "")
-            , action: {
-                if let url = clients[client]?.url {
-                    UIApplication.shared.open(url)
-                }
-            }))
+
+        for client in availableClients {
+            buttons.append(.default(Text(client.name), action: { UIApplication.shared.open(client.url) }))
         }
-        
+
         buttons.append(.cancel())
-        
+
         return buttons
     }
-    
-    private func getAvailableClients() -> [URLSchemes] {
-        var availableClients = [URLSchemes]()
-        
-        for scheme in URLSchemes.allCases {
-            if let url = URL(string: scheme.rawValue), UIApplication.shared.canOpenURL(url) {
-                availableClients.append(scheme)
+
+    private func getAvailableClients() -> [EmailClient] {
+        var availableClients = [EmailClient]()
+
+        for client in clients {
+            if UIApplication.shared.canOpenURL(client.url) {
+                availableClients.append(client)
             }
         }
-        
+
         return availableClients
     }
-    
-    private static func checkInfoDictionary() {
+
+    private func checkInfoDictionary() {
         if let schemes = Bundle.main.infoDictionary?["LSApplicationQueriesSchemes"] as? Array<String> {
             // Bundle exists, check values
             for requiredScheme in URLSchemes.requiredSchemes() {

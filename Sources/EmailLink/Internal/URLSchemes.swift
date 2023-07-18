@@ -5,13 +5,13 @@ enum URLSchemes: String, CaseIterable {
          Spark = "readdle-spark://",
          AirMail = "airmail://",
          Default = "mailto:"
-    
+
     func formattedScheme() -> String {
         self.rawValue
             .replacingOccurrences(of: ":", with: "")
             .replacingOccurrences(of: "//", with: "")
     }
-    
+
     static func requiredSchemes() -> [String] {
         [
             Self.Gmail.formattedScheme(),
