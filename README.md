@@ -10,11 +10,11 @@ Tested on iOS 16.0 but should work on iOS and iPadOS 13.0 and up.
 	```xml
     <key>LSApplicationQueriesSchemes</key>
 	<array>
-	    <string>googlegmail://</string>
-	    <string>ms-outlook://</string>
-	    <string>readdle-spark://</string>
-	    <string>ymail://</string>
-	    <string>airmail://</string>
+	    <string>googlegmail</string>
+	    <string>ms-outlook</string>
+	    <string>readdle-spark</string>
+	    <string>ymail</string>
+	    <string>airmail</string>
 	</array>
     ```
 3. Add the component where you want to use it
