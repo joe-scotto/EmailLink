@@ -6,7 +6,7 @@ public struct EmailLink<Content: View>: View {
     @State private var showAlert = false
     
     private let label: Content
-    private let clients: [URLSchemes: EmailClient]
+    private let clients: [EmailClient]
     
     public init(to: String, subject: String = "", body: String = "", color: UIColor = .systemBlue, @ViewBuilder label: () -> Content) {
         // Ensure Info.plist includes required keys
@@ -15,7 +15,7 @@ public struct EmailLink<Content: View>: View {
         // Set properties
         self.label = label()
         self.clients =  [
-            .Gmail: EmailClient(
+            EmailClient(
                 name: "Gmail",
                 scheme: .Gmail,
                 host: "co",
@@ -25,7 +25,7 @@ public struct EmailLink<Content: View>: View {
                     URLQueryItem(name: "body", value: body)
                 ]
             ),
-            .Outlook: EmailClient(
+            EmailClient(
                 name: "Outlook",
                 scheme: .Outlook,
                 host: "compose",
@@ -35,7 +35,7 @@ public struct EmailLink<Content: View>: View {
                     URLQueryItem(name: "body", value: body)
                 ]
             ),
-            .Yahoo: EmailClient(
+            EmailClient(
                 name: "Yahoo",
                 scheme: .Yahoo,
                 host: "mail",
@@ -46,7 +46,7 @@ public struct EmailLink<Content: View>: View {
                     URLQueryItem(name: "body", value: body)
                 ]
             ),
-            .Spark: EmailClient(
+            EmailClient(
                 name: "Spark",
                 scheme: .Spark,
                 host: "compose",
@@ -56,7 +56,7 @@ public struct EmailLink<Content: View>: View {
                     URLQueryItem(name: "body", value: body)
                 ]
             ),
-            .AirMail: EmailClient(
+            EmailClient(
                 name: "Airmail",
                 scheme: .AirMail,
                 host: "compose",
@@ -66,7 +66,7 @@ public struct EmailLink<Content: View>: View {
                     URLQueryItem(name: "plainBody", value: body)
                 ]
             ),
-            .Default: EmailClient(
+            EmailClient(
                 name: "Default",
                 scheme: .Default,
                 path: to,
