@@ -4,7 +4,8 @@ typealias ActionSheetButton = ActionSheet.Button
 
 public struct EmailLink<Content: View>: View {
     @State private var showAlert = false
-    
+    @State private var availableClients = [EmailClient]()
+
     private let label: Content
     private let clients: [EmailClient]
     
@@ -19,7 +20,7 @@ public struct EmailLink<Content: View>: View {
 
     public var body: some View {
         Button(action: {
-            let availableClients = getAvailableClients()
+            availableClients = getAvailableClients()
 
             if availableClients.count > 2 {
                 showAlert = true
@@ -46,7 +47,7 @@ public struct EmailLink<Content: View>: View {
     private func actionSheetButtons() -> [ActionSheetButton] {
         var buttons = [ActionSheetButton]()
         
-        for client in getAvailableClients() {
+        for client in availableClients {
             buttons.append(.default(Text(client.name), action: { UIApplication.shared.open(client.url) }))
         }
         
