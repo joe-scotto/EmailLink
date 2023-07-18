@@ -90,10 +90,8 @@ public struct EmailLink<Content: View>: View {
             } else {
                 // Only open first found available client.
                 for client in availableClients {
-                    if UIApplication.shared.canOpenURL(client.value.url) {
-                        UIApplication.shared.open(client.value.url)
-                        break
-                    }
+                    UIApplication.shared.open(client.url)
+                    break
                 }
             }
         }) {
@@ -112,29 +110,23 @@ public struct EmailLink<Content: View>: View {
         var buttons = [ActionSheetButton]()
         
         for client in getAvailableClients() {
-            buttons.append(.default(
-                Text(clients[client]?.name ?? "")
-            , action: {
-                if let url = clients[client]?.url {
-                    UIApplication.shared.open(url)
-                }
-            }))
+            buttons.append(.default(Text(client.name), action: { UIApplication.shared.open(client.url) }))
         }
         
         buttons.append(.cancel())
         
         return buttons
     }
-    
-    private func getAvailableClients() -> [URLSchemes] {
-        var availableClients = [URLSchemes]()
-        
-        for scheme in URLSchemes.allCases {
-            if let url = URL(string: client.value.url), UIApplication.shared.canOpenURL(url) {
-                availableClients.append(scheme)
+
+    private func getAvailableClients() -> [EmailClient] {
+        var availableClients = [EmailClient]()
+
+        for client in clients {
+            if UIApplication.shared.canOpenURL(client.value.url) {
+                availableClients.append(client.value)
             }
         }
-        
+
         return availableClients
     }
     
