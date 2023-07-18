@@ -8,12 +8,12 @@ public struct EmailLink<Content: View>: View {
 
     private let label: Content
     private let clients: [EmailClient]
-    
+
     public init(to: String, subject: String = "", body: String = "", color: UIColor = .systemBlue, @ViewBuilder label: () -> Content) {
         // Set properties
         self.label = label()
         self.clients =  EmailClient.allClients(to: to, subject: subject, body: body)
-        
+
         // Force color for ActionSheet
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = color
     }
@@ -43,16 +43,16 @@ public struct EmailLink<Content: View>: View {
             self.checkInfoDictionary()
         }
     }
-    
+
     private func actionSheetButtons() -> [ActionSheetButton] {
         var buttons = [ActionSheetButton]()
-        
+
         for client in availableClients {
             buttons.append(.default(Text(client.name), action: { UIApplication.shared.open(client.url) }))
         }
-        
+
         buttons.append(.cancel())
-        
+
         return buttons
     }
 
@@ -67,7 +67,7 @@ public struct EmailLink<Content: View>: View {
 
         return availableClients
     }
-    
+
     private func checkInfoDictionary() {
         if let schemes = Bundle.main.infoDictionary?["LSApplicationQueriesSchemes"] as? Array<String> {
             // Bundle exists, check values

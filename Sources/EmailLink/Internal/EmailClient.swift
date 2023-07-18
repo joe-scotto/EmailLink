@@ -96,4 +96,3 @@ struct EmailClient {
         ]
     }
 }
-
