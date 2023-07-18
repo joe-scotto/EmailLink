@@ -10,7 +10,7 @@ public struct EmailLink<Content: View>: View {
     
     public init(to: String, subject: String = "", body: String = "", color: UIColor = .systemBlue, @ViewBuilder label: () -> Content) {
         // Ensure Info.plist includes required keys
-        self.checkInfoDictionary()
+        Self.checkInfoDictionary()
         
         // Set properties
         self.label = label()
@@ -83,11 +83,13 @@ public struct EmailLink<Content: View>: View {
 
     public var body: some View {
         Button(action: {
-            if getAvailableClients().count > 2 {
+            let availableClients = getAvailableClients()
+
+            if availableClients.count > 2 {
                 showAlert = true
             } else {
-                // Only open first found
-                for client in clients {
+                // Only open first found available client.
+                for client in availableClients {
                     if UIApplication.shared.canOpenURL(client.value.url) {
                         UIApplication.shared.open(client.value.url)
                         break
@@ -128,7 +130,7 @@ public struct EmailLink<Content: View>: View {
         var availableClients = [URLSchemes]()
         
         for scheme in URLSchemes.allCases {
-            if let url = URL(string: scheme.rawValue), UIApplication.shared.canOpenURL(url) {
+            if let url = URL(string: client.value.url), UIApplication.shared.canOpenURL(url) {
                 availableClients.append(scheme)
             }
         }
