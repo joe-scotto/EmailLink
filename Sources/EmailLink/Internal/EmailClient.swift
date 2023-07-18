@@ -17,6 +17,7 @@ struct EmailClient {
 
     var url: URL {
         var components = URLComponents()
+
         components.scheme = scheme.formattedScheme()
         components.host = host
         components.path = path

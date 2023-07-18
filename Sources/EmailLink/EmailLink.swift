@@ -9,9 +9,6 @@ public struct EmailLink<Content: View>: View {
     private let clients: [EmailClient]
     
     public init(to: String, subject: String = "", body: String = "", color: UIColor = .systemBlue, @ViewBuilder label: () -> Content) {
-        // Ensure Info.plist includes required keys
-        Self.checkInfoDictionary()
-        
         // Set properties
         self.label = label()
         self.clients =  EmailClient.allClients(to: to, subject: subject, body: body)
@@ -27,7 +24,7 @@ public struct EmailLink<Content: View>: View {
             if availableClients.count > 2 {
                 showAlert = true
             } else {
-                // Only open first found available client.
+                // Only open the first found available client.
                 for client in availableClients {
                     UIApplication.shared.open(client.url)
                     break
@@ -42,6 +39,9 @@ public struct EmailLink<Content: View>: View {
                 message: Text("Which app do you want to use to send this email?"),
                 buttons: actionSheetButtons()
             )
+        }.onAppear() {
+            // Ensure Info.plist includes required keys before loading view.
+            self.checkInfoDictionary()
         }
     }
     
@@ -69,7 +69,7 @@ public struct EmailLink<Content: View>: View {
         return availableClients
     }
     
-    private static func checkInfoDictionary() {
+    private func checkInfoDictionary() {
         if let schemes = Bundle.main.infoDictionary?["LSApplicationQueriesSchemes"] as? Array<String> {
             // Bundle exists, check values
             for requiredScheme in URLSchemes.requiredSchemes() {
