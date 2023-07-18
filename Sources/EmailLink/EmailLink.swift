@@ -10,7 +10,7 @@ public struct EmailLink<Content: View>: View {
     
     public init(to: String, subject: String = "", body: String = "", color: UIColor = .systemBlue, @ViewBuilder label: () -> Content) {
         // Ensure Info.plist includes required keys
-        Self.checkInfoDictionary()
+        self.checkInfoDictionary()
         
         // Set properties
         self.label = label()
@@ -90,6 +90,7 @@ public struct EmailLink<Content: View>: View {
                 for client in clients {
                     if UIApplication.shared.canOpenURL(client.value.url) {
                         UIApplication.shared.open(client.value.url)
+                        break
                     }
                 }
             }
