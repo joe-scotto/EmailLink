@@ -14,68 +14,7 @@ public struct EmailLink<Content: View>: View {
         
         // Set properties
         self.label = label()
-        self.clients =  [
-            EmailClient(
-                name: "Gmail",
-                scheme: .Gmail,
-                host: "co",
-                queryItems: [
-                    URLQueryItem(name: "to", value: to),
-                    URLQueryItem(name: "subject", value: subject),
-                    URLQueryItem(name: "body", value: body)
-                ]
-            ),
-            EmailClient(
-                name: "Outlook",
-                scheme: .Outlook,
-                host: "compose",
-                queryItems: [
-                    URLQueryItem(name: "to", value: to),
-                    URLQueryItem(name: "subject", value: subject),
-                    URLQueryItem(name: "body", value: body)
-                ]
-            ),
-            EmailClient(
-                name: "Yahoo",
-                scheme: .Yahoo,
-                host: "mail",
-                path: "/compose",
-                queryItems: [
-                    URLQueryItem(name: "to", value: to),
-                    URLQueryItem(name: "subject", value: subject),
-                    URLQueryItem(name: "body", value: body)
-                ]
-            ),
-            EmailClient(
-                name: "Spark",
-                scheme: .Spark,
-                host: "compose",
-                queryItems: [
-                    URLQueryItem(name: "recipient", value: to),
-                    URLQueryItem(name: "subject", value: subject),
-                    URLQueryItem(name: "body", value: body)
-                ]
-            ),
-            EmailClient(
-                name: "Airmail",
-                scheme: .AirMail,
-                host: "compose",
-                queryItems: [
-                    URLQueryItem(name: "to", value: to),
-                    URLQueryItem(name: "subject", value: subject),
-                    URLQueryItem(name: "plainBody", value: body)
-                ]
-            ),
-            EmailClient(
-                name: "Default",
-                scheme: .Default,
-                path: to,
-                queryItems: [
-                    URLQueryItem(name: "subject", value: subject),
-                    URLQueryItem(name: "body", value: body)
-                ]
-            )
-        ]
+        self.clients =  EmailClient.allClients(to: to, subject: subject, body: body)
         
         // Force color for ActionSheet
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = color
@@ -122,8 +61,8 @@ public struct EmailLink<Content: View>: View {
         var availableClients = [EmailClient]()
 
         for client in clients {
-            if UIApplication.shared.canOpenURL(client.value.url) {
-                availableClients.append(client.value)
+            if UIApplication.shared.canOpenURL(client.url) {
+                availableClients.append(client)
             }
         }
 
