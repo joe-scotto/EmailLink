@@ -24,10 +24,8 @@ public struct EmailLink<Content: View>: View {
             if availableClients.count > 2 {
                 showAlert = true
             } else {
-                // Only open the first found available client.
-                for client in availableClients {
-                    UIApplication.shared.open(client.url)
-                    break
+                if let url = availableClients.first?.url {
+                    UIApplication.shared.open(url)
                 }
             }
         }) {
